@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-dark: #0D0D14;
+    --primary: #7C5CFC;
+    --success: #35E59A;
+    --error: #FF5570;
+    --text-muted: #9A9AA8;
+  }
+
+  body {
+    background-color: #0D0D14;
+    color: #FFFFFF;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+}
+
+.font-display {
+  font-family: 'Unbounded', 'Plus Jakarta Sans', sans-serif;
+}
