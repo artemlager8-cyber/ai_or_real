@@ -7,7 +7,7 @@
  */
 
 // Ссылка на форму отзыва (Google Forms или др.)
-export const FEEDBACK_URL: string = "https://forms.gle/REPLACE_ME";
+export const FEEDBACK_URL: string = "https://forms.gle/sSzkhGJ5NnFuCYcY9";
 
 // Токен Cloudflare Web Analytics (замените "REPLACE_ME" на ваш токен beacon)
 export const CF_ANALYTICS_TOKEN: string = "REPLACE_ME";
