@@ -1,6 +1,7 @@
-import { GameStats } from '../types';
+import { GameStats, Language } from '../types';
 
 const STATS_STORAGE_KEY = 'ai_or_real_game_stats_v1';
+const LANG_STORAGE_KEY = 'ai_or_real_lang_pref_v1';
 
 export const DEFAULT_STATS: GameStats = {
   gamesPlayed: 0,
@@ -10,6 +11,26 @@ export const DEFAULT_STATS: GameStats = {
   totalXp: 0,
   maxStreak: 0,
 };
+
+export function loadLanguage(): Language {
+  try {
+    const saved = localStorage.getItem(LANG_STORAGE_KEY);
+    if (saved === 'ru' || saved === 'en') {
+      return saved;
+    }
+  } catch {
+    // ignore
+  }
+  return 'ru';
+}
+
+export function saveLanguage(lang: Language): void {
+  try {
+    localStorage.setItem(LANG_STORAGE_KEY, lang);
+  } catch {
+    // ignore
+  }
+}
 
 export function loadGameStats(): GameStats {
   try {

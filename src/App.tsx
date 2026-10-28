@@ -1,14 +1,14 @@
 /**
  * AI or Real? — Обучающая игра на внимательность и медиаграмотность
- * Проект школьной команды: помогает подросткам научиться отличать
- * сгенерированные искусственным интеллектом изображения от настоящих фотографий.
+ * Bilingual educational game (EN / RU) helping teens spot AI artifacts and understand real photography details.
  */
 
 import React, { useState, useEffect } from 'react';
-import { ScreenState, GameStats, GameItem, AnswerType, AnswerResult } from './types';
-import { getRandomGameDeck } from './data/items';
+import { ScreenState, GameStats, GameItem, AnswerType, AnswerResult, Language } from './types';
+import { getRandomGameDeck } from './data/questions';
 import { getStreakBonus } from './utils/levels';
-import { loadGameStats, saveGameStats, resetGameStats } from './utils/storage';
+import { loadGameStats, saveGameStats, resetGameStats, loadLanguage, saveLanguage } from './utils/storage';
+import { TRANSLATIONS } from './utils/i18n';
 import { Header } from './components/Header';
 import { HomeScreen } from './components/HomeScreen';
 import { GameScreen } from './components/GameScreen';
@@ -19,6 +19,9 @@ import { RulesModal } from './components/RulesModal';
 export default function App() {
   // Текущий активный экран приложения
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('HOME');
+
+  // Язык интерфейса: RU или EN (сохраняется в localStorage)
+  const [language, setLanguage] = useState<Language>(() => loadLanguage());
 
   // Локальная статистика игрока (сохраняется в localStorage)
   const [stats, setStats] = useState<GameStats>(() => loadGameStats());
@@ -35,6 +38,12 @@ export default function App() {
   useEffect(() => {
     saveGameStats(stats);
   }, [stats]);
+
+  // Переключение языка
+  const handleLanguageChange = (newLang: Language) => {
+    setLanguage(newLang);
+    saveLanguage(newLang);
+  };
 
   // Запуск новой игры
   const handleStartGame = () => {
@@ -108,12 +117,17 @@ export default function App() {
     setStats(freshStats);
   };
 
+  const t = TRANSLATIONS[language];
+
   return (
     <div className="min-h-screen bg-[#0D0D14] text-white flex flex-col justify-between selection:bg-[#7C5CFC] selection:text-white">
-      {/* Header bar */}
+      {/* Header bar with language switcher */}
       <Header
         currentScreen={currentScreen}
         stats={stats}
+        currentSessionXp={currentGameXp}
+        language={language}
+        onLanguageChange={handleLanguageChange}
         onNavigate={setCurrentScreen}
       />
 
@@ -122,6 +136,7 @@ export default function App() {
         {currentScreen === 'HOME' && (
           <HomeScreen
             stats={stats}
+            language={language}
             onStartGame={handleStartGame}
             onNavigate={setCurrentScreen}
           />
@@ -134,6 +149,7 @@ export default function App() {
             currentItem={gameDeck[currentQuestionIndex]}
             currentGameXp={currentGameXp}
             streak={currentStreak}
+            language={language}
             onAnswerSubmit={handleAnswerSubmit}
             onNextQuestion={handleNextQuestion}
           />
@@ -146,6 +162,7 @@ export default function App() {
             earnedXp={currentGameXp}
             maxSessionStreak={maxSessionStreak}
             stats={stats}
+            language={language}
             onPlayAgain={handleStartGame}
             onNavigate={setCurrentScreen}
           />
@@ -154,6 +171,7 @@ export default function App() {
         {currentScreen === 'STATS' && (
           <StatsModal
             stats={stats}
+            language={language}
             onBack={() => setCurrentScreen('HOME')}
             onReset={handleResetStats}
           />
@@ -161,6 +179,7 @@ export default function App() {
 
         {currentScreen === 'RULES' && (
           <RulesModal
+            language={language}
             onBack={() => setCurrentScreen('HOME')}
             onStartGame={handleStartGame}
           />
@@ -169,8 +188,9 @@ export default function App() {
 
       {/* Footer subtle tag */}
       <footer className="w-full max-w-md mx-auto py-2 text-center text-[10px] text-[#9A9AA8]/50">
-        AI or Real? • Учебный школьный проект • Медиаграмотность
+        {t.footerNote}
       </footer>
     </div>
   );
 }
+

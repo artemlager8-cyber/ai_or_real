@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Sparkles, Maximize2, Flame, Bot, Camera, ImageOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GameItem, AnswerType, AnswerResult } from '../types';
+import { GameItem, AnswerType, AnswerResult, Language } from '../types';
 import { getStreakBonus } from '../utils/levels';
 import { ResultFeedback } from './ResultFeedback';
 import { ImageModal } from './ImageModal';
+import { getItemTitle, getItemCategory } from '../data/items';
+import { TRANSLATIONS } from '../utils/i18n';
 
 interface GameScreenProps {
   questionIndex: number; // 0-based
@@ -12,6 +14,7 @@ interface GameScreenProps {
   currentItem: GameItem;
   currentGameXp: number;
   streak: number;
+  language: Language;
   onAnswerSubmit: (answer: AnswerType) => AnswerResult;
   onNextQuestion: () => void;
 }
@@ -22,6 +25,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   currentItem,
   currentGameXp,
   streak,
+  language,
   onAnswerSubmit,
   onNextQuestion,
 }) => {
@@ -30,6 +34,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  const t = TRANSLATIONS[language];
+  const itemTitle = getItemTitle(currentItem, language);
+  const itemCategory = getItemCategory(currentItem, language);
 
   // Handle user picking AI or REAL
   const handleSelect = (choice: AnswerType) => {
@@ -57,7 +65,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         <div className="flex items-center justify-between">
           {/* Question counter */}
           <span className="font-display font-bold text-sm tracking-wide text-white/90">
-            Вопрос {questionIndex + 1} <span className="text-[#9A9AA8]">/ {totalQuestions}</span>
+            {t.questionProgress(questionIndex + 1, totalQuestions)}
           </span>
 
           {/* Current Game XP & Streak */}
@@ -94,16 +102,16 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           {/* Header over image: Category badge and inspect action */}
           <div className="flex items-center justify-between mb-2 px-1">
             <span className="text-[11px] font-bold text-[#7C5CFC] bg-[#7C5CFC]/15 border border-[#7C5CFC]/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-              {currentItem.categoryRu}
+              {itemCategory}
             </span>
 
             <button
               onClick={() => setIsZoomOpen(true)}
               className="flex items-center gap-1 text-[11px] text-[#9A9AA8] hover:text-white bg-white/5 hover:bg-white/10 px-2 py-1 rounded-lg transition-colors"
-              title="Увеличить изображение"
+              title={t.zoomBtn}
             >
               <Maximize2 className="w-3.5 h-3.5" />
-              <span>Приблизить</span>
+              <span>{t.zoomBtn}</span>
             </button>
           </div>
 
@@ -116,7 +124,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             {!imageLoaded && !imageError && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#171725] animate-pulse text-[#9A9AA8]">
                 <Sparkles className="w-8 h-8 text-[#7C5CFC] animate-spin mb-2" />
-                <span className="text-xs">Загрузка изображения...</span>
+                <span className="text-xs">{t.imageLoading}</span>
               </div>
             )}
 
@@ -125,16 +133,16 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#171725] p-4 text-center">
                 <ImageOff className="w-10 h-10 text-[#FF5570] mb-2" />
                 <span className="text-sm font-semibold text-white mb-1">
-                  {currentItem.title}
+                  {itemTitle}
                 </span>
                 <span className="text-xs text-[#9A9AA8]">
-                  Категория: {currentItem.categoryRu}
+                  {t.categoryLabel}: {itemCategory}
                 </span>
               </div>
             ) : (
               <img
                 src={currentItem.image}
-                alt={currentItem.title}
+                alt={itemTitle}
                 onLoad={() => setImageLoaded(true)}
                 onError={() => setImageError(true)}
                 className={`w-full h-full object-cover select-none transition-all duration-300 ${
@@ -147,13 +155,13 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             {/* Tap to inspect overlay clue */}
             <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md text-[10px] text-white/80 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
               <Maximize2 className="w-3 h-3" />
-              <span>Нажми для зума</span>
+              <span>{t.tapToZoom}</span>
             </div>
           </div>
 
           {/* Subject title hint */}
           <p className="text-xs text-center text-[#9A9AA8] mt-2.5 px-2 truncate">
-            {currentItem.title}
+            {itemTitle}
           </p>
         </div>
       </div>
@@ -172,10 +180,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               {/* Question label */}
               <div className="text-center">
                 <h2 className="font-display font-bold text-lg text-white">
-                  Что это?
+                  {t.whatIsThis}
                 </h2>
                 <p className="text-xs text-[#9A9AA8]">
-                  Серия даёт бонус: следующий ответ принесет +{nextBonus} XP
+                  {t.streakBonusHint(nextBonus)}
                 </p>
               </div>
 
@@ -200,7 +208,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     🤖 AI
                   </span>
                   <span className="text-[11px] text-[#9A9AA8] font-medium">
-                    Нейросеть
+                    {t.aiSubtitle}
                   </span>
                 </motion.button>
 
@@ -223,7 +231,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     📷 REAL
                   </span>
                   <span className="text-[11px] text-[#9A9AA8] font-medium">
-                    Настоящее фото
+                    {t.realSubtitle}
                   </span>
                 </motion.button>
               </div>
@@ -233,6 +241,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               key="feedback"
               result={currentResult}
               isLastQuestion={isLastQuestion}
+              language={language}
               onNext={handleNext}
             />
           )}
@@ -243,9 +252,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       <ImageModal
         isOpen={isZoomOpen}
         imageUrl={currentItem.image}
-        title={currentItem.title}
+        title={itemTitle}
+        language={language}
         onClose={() => setIsZoomOpen(false)}
       />
     </div>
   );
 };
+

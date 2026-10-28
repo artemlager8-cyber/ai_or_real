@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { Trophy, CheckCircle2, Flame, Percent, Gamepad2, ArrowLeft, Trash2, Award, Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
-import { GameStats, ScreenState } from '../types';
-import { LEVELS, getLevelByXp } from '../utils/levels';
+import { Trophy, CheckCircle2, Flame, Percent, Gamepad2, ArrowLeft, Trash2, Award } from 'lucide-react';
+import { GameStats, Language } from '../types';
+import { LEVELS, getLevelByXp, getLevelTitle } from '../utils/levels';
+import { TRANSLATIONS } from '../utils/i18n';
 
 interface StatsModalProps {
   stats: GameStats;
+  language: Language;
   onBack: () => void;
   onReset: () => void;
 }
 
-export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }) => {
+export const StatsModal: React.FC<StatsModalProps> = ({ stats, language, onBack, onReset }) => {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
   const currentLevel = getLevelByXp(stats.totalXp);
+  const t = TRANSLATIONS[language];
   
   // Calculate accuracy
   const accuracy = stats.totalAnswered > 0
@@ -37,22 +39,22 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
       <div className="w-full flex items-center justify-between mb-4">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-xs font-semibold text-[#9A9AA8] hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-xl transition-colors"
+          className="flex items-center gap-1.5 text-xs font-semibold text-[#9A9AA8] hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Назад</span>
+          <span>{t.backBtn}</span>
         </button>
 
         <h1 className="font-display font-black text-lg text-white">
-          Моя статистика
+          {t.myStatsTitle}
         </h1>
 
         <div className="w-12 text-right">
           {/* subtle reset icon */}
           <button
             onClick={() => setShowConfirmReset(true)}
-            className="text-[#9A9AA8]/50 hover:text-[#FF5570] p-1 transition-colors"
-            title="Сбросить статистику"
+            className="text-[#9A9AA8]/50 hover:text-[#FF5570] p-1 transition-colors cursor-pointer"
+            title={t.resetStatsTooltip}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -69,13 +71,13 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#7C5CFC] uppercase tracking-wider block">
-                Текущий уровень: {currentLevel.level}
+                {t.currentRankBadge(currentLevel.level)}
               </span>
               <h2 className="font-display font-extrabold text-xl text-white">
-                {currentLevel.title}
+                {getLevelTitle(currentLevel, language)}
               </h2>
               <span className="text-xs text-[#9A9AA8]">
-                Всего набрано: <strong className="text-[#35E59A]">{stats.totalXp} XP</strong>
+                {t.totalEarnedXp(stats.totalXp)}
               </span>
             </div>
           </div>
@@ -84,7 +86,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
           {nextLevel ? (
             <div className="space-y-1.5 pt-2 border-t border-white/5">
               <div className="flex justify-between text-[11px] text-[#9A9AA8]">
-                <span>До уровня «{nextLevel.title}»</span>
+                <span>{t.progressToNextRank(getLevelTitle(nextLevel, language))}</span>
                 <span className="text-white font-medium">{progressPercent}%</span>
               </div>
               <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
@@ -100,7 +102,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
             </div>
           ) : (
             <div className="text-xs text-[#35E59A] font-semibold pt-1 border-t border-white/5">
-              👑 Максимальный уровень достигнут!
+              {t.maxRankReached}
             </div>
           )}
         </div>
@@ -114,7 +116,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
             </div>
             <div>
               <span className="text-[11px] text-[#9A9AA8] block font-medium">
-                Игр сыграно
+                {t.gamesPlayedLabel}
               </span>
               <span className="font-display font-extrabold text-lg text-white">
                 {stats.gamesPlayed}
@@ -129,7 +131,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
             </div>
             <div>
               <span className="text-[11px] text-[#9A9AA8] block font-medium">
-                Правильных ответов
+                {t.correctAnswersCountLabel}
               </span>
               <span className="font-display font-extrabold text-lg text-[#35E59A]">
                 {stats.totalCorrect}
@@ -144,7 +146,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
             </div>
             <div>
               <span className="text-[11px] text-[#9A9AA8] block font-medium">
-                Лучший результат
+                {t.bestScoreMetricLabel}
               </span>
               <span className="font-display font-extrabold text-lg text-white">
                 {stats.bestScore} XP
@@ -159,7 +161,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
             </div>
             <div>
               <span className="text-[11px] text-[#9A9AA8] block font-medium">
-                Точность ответов
+                {t.accuracyMetricLabel}
               </span>
               <span className="font-display font-extrabold text-lg text-white">
                 {accuracy}%
@@ -174,7 +176,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
             </div>
             <div>
               <span className="text-[11px] text-[#9A9AA8] block font-medium">
-                Макс. серия
+                {t.maxStreakMetricLabel}
               </span>
               <span className="font-display font-extrabold text-lg text-orange-300">
                 {stats.maxStreak} 🔥
@@ -189,10 +191,10 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
             </div>
             <div>
               <span className="text-[11px] text-[#9A9AA8] block font-medium">
-                Текущий уровень
+                {t.currentRankMetricLabel}
               </span>
               <span className="font-display font-extrabold text-xs text-[#7C5CFC] block truncate">
-                {currentLevel.title}
+                {getLevelTitle(currentLevel, language)}
               </span>
             </div>
           </div>
@@ -202,7 +204,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
         <div className="bg-[#151520] border border-white/10 rounded-2xl p-4">
           <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <Award className="w-4 h-4 text-[#7C5CFC]" />
-            <span>Иерархия детективов</span>
+            <span>{t.detectiveHierarchyTitle}</span>
           </h3>
 
           <div className="space-y-2">
@@ -225,10 +227,10 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
                     <span className="text-base">{lvl.badge}</span>
                     <div>
                       <span className="block font-semibold">
-                        Уровень {lvl.level} — {lvl.title}
+                        {t.levelBadge(lvl.level)} — {getLevelTitle(lvl, language)}
                       </span>
                       <span className="text-[10px] text-[#9A9AA8]">
-                        от {lvl.minXp} XP
+                        {t.fromMinXp(lvl.minXp)}
                       </span>
                     </div>
                   </div>
@@ -236,15 +238,15 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
                   <div>
                     {isCurrent ? (
                       <span className="text-[10px] bg-[#7C5CFC] text-white px-2 py-0.5 rounded-md">
-                        Текущий
+                        {t.currentBadge}
                       </span>
                     ) : isAchieved ? (
                       <span className="text-[10px] text-[#35E59A]">
-                        ✓ Достигнут
+                        {t.achievedBadge}
                       </span>
                     ) : (
                       <span className="text-[10px] text-[#9A9AA8]/40">
-                        🔒 Заблокирован
+                        {t.lockedBadge}
                       </span>
                     )}
                   </div>
@@ -260,26 +262,26 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
           <div className="w-full max-w-xs bg-[#1A1A28] border border-white/15 rounded-2xl p-5 shadow-2xl text-center space-y-3">
             <h4 className="font-display font-bold text-base text-white">
-              Сбросить всю статистику?
+              {t.resetConfirmTitle}
             </h4>
             <p className="text-xs text-[#9A9AA8]">
-              Очки, уровень и серии будут обнулены. Это действие нельзя отменить.
+              {t.resetConfirmDesc}
             </p>
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setShowConfirmReset(false)}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white"
+                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white cursor-pointer"
               >
-                Отмена
+                {t.cancelBtn}
               </button>
               <button
                 onClick={() => {
                   onReset();
                   setShowConfirmReset(false);
                 }}
-                className="flex-1 py-2 px-3 rounded-xl bg-[#FF5570] hover:bg-[#FF5570]/90 text-xs font-semibold text-white"
+                className="flex-1 py-2 px-3 rounded-xl bg-[#FF5570] hover:bg-[#FF5570]/90 text-xs font-semibold text-white cursor-pointer"
               >
-                Сбросить
+                {t.confirmResetBtn}
               </button>
             </div>
           </div>
@@ -290,11 +292,12 @@ export const StatsModal: React.FC<StatsModalProps> = ({ stats, onBack, onReset }
       <div className="pt-3">
         <button
           onClick={onBack}
-          className="w-full py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-sm font-semibold text-white transition-colors"
+          className="w-full py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-sm font-semibold text-white transition-colors cursor-pointer"
         >
-          Вернуться
+          {t.returnBtn}
         </button>
       </div>
     </div>
   );
 };
+

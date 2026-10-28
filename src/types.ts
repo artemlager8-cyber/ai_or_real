@@ -1,3 +1,5 @@
+export type Language = 'ru' | 'en';
+
 export type ItemCategory = 
   | 'People' 
   | 'Animals' 
@@ -5,7 +7,10 @@ export type ItemCategory =
   | 'Nature' 
   | 'Rooms' 
   | 'Cars' 
-  | 'Objects';
+  | 'Objects'
+  | 'News'
+  | 'Ads'
+  | string;
 
 export type AnswerType = 'AI' | 'REAL';
 
@@ -15,10 +20,16 @@ export interface GameItem {
   answer: AnswerType;
   category: ItemCategory;
   categoryRu: string;
+  categoryEn?: string;
   title: string;
+  titleEn?: string;
   explanation: string;
+  explanationEn?: string;
   clues: string[];
+  cluesEn?: string[];
 }
+
+export type Question = GameItem;
 
 export type ScreenState = 'HOME' | 'PLAYING' | 'STATS' | 'RULES' | 'GAMEOVER';
 
@@ -34,6 +45,7 @@ export interface GameStats {
 export interface UserLevel {
   level: number;
   title: string;
+  titleEn?: string;
   minXp: number;
   maxXp: number;
   badge: string;

@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
 import { X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Language } from '../types';
+import { TRANSLATIONS } from '../utils/i18n';
 
 interface ImageModalProps {
   isOpen: boolean;
   imageUrl: string;
   title: string;
+  language?: Language;
   onClose: () => void;
 }
 
-export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, title, onClose }) => {
+export const ImageModal: React.FC<ImageModalProps> = ({
+  isOpen,
+  imageUrl,
+  title,
+  language = 'ru',
+  onClose,
+}) => {
   const [scale, setScale] = useState(1);
+  const t = TRANSLATIONS[language];
 
   if (!isOpen) return null;
 
@@ -33,7 +43,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, title,
           onClick={(e) => e.stopPropagation()}
         >
           <span className="text-sm font-medium text-white/80 truncate pr-2">
-            🔍 {title}
+            {t.inspectTitle(title)}
           </span>
 
           <div className="flex items-center gap-2">
@@ -41,7 +51,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, title,
               onClick={handleZoomOut}
               disabled={scale <= 1}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-40 transition-colors"
-              title="Уменьшить"
+              title={t.zoomOutTitle}
             >
               <ZoomOut className="w-4 h-4" />
             </button>
@@ -49,7 +59,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, title,
               onClick={handleZoomIn}
               disabled={scale >= 3}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-40 transition-colors"
-              title="Увеличить"
+              title={t.zoomInTitle}
             >
               <ZoomIn className="w-4 h-4" />
             </button>
@@ -57,7 +67,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, title,
               <button
                 onClick={handleReset}
                 className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-                title="Сброс масштаба"
+                title={t.resetZoomTitle}
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -65,7 +75,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, title,
             <button
               onClick={onClose}
               className="p-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors ml-2"
-              title="Закрыть"
+              title={t.closeBtn}
             >
               <X className="w-5 h-5" />
             </button>
@@ -88,7 +98,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, title,
         </div>
 
         <p className="text-xs text-[#9A9AA8] mt-3 text-center">
-          Внимательно осмотри пальцы, фон, блики и надписи
+          {t.inspectInstructions}
         </p>
       </motion.div>
     </AnimatePresence>

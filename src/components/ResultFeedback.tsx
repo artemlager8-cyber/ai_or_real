@@ -1,20 +1,27 @@
 import React from 'react';
-import { Check, X, ArrowRight, Sparkles, Flame, HelpCircle } from 'lucide-react';
+import { Check, X, ArrowRight, Flame, HelpCircle } from 'lucide-react';
 import { motion } from 'motion/react';
-import { AnswerResult } from '../types';
+import { AnswerResult, Language } from '../types';
+import { getItemExplanation, getItemClues } from '../data/items';
+import { TRANSLATIONS } from '../utils/i18n';
 
 interface ResultFeedbackProps {
   result: AnswerResult;
   isLastQuestion: boolean;
+  language: Language;
   onNext: () => void;
 }
 
 export const ResultFeedback: React.FC<ResultFeedbackProps> = ({
   result,
   isLastQuestion,
+  language,
   onNext,
 }) => {
-  const { isCorrect, userAnswer, earnedXp, streak, item } = result;
+  const { isCorrect, earnedXp, streak, item } = result;
+  const t = TRANSLATIONS[language];
+  const explanation = getItemExplanation(item, language);
+  const clues = getItemClues(item, language);
 
   return (
     <motion.div
@@ -48,7 +55,7 @@ export const ResultFeedback: React.FC<ResultFeedbackProps> = ({
             {isCorrect ? <Check className="w-5 h-5 stroke-[3]" /> : <X className="w-5 h-5 stroke-[3]" />}
           </div>
           <span className="font-display font-black text-lg tracking-wider">
-            {isCorrect ? '✓ ПРАВИЛЬНО!' : '✕ НЕПРАВИЛЬНО'}
+            {isCorrect ? t.correctTitle : t.incorrectTitle}
           </span>
         </div>
 
@@ -69,17 +76,17 @@ export const ResultFeedback: React.FC<ResultFeedbackProps> = ({
         <div className="flex items-center justify-between bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl text-xs text-amber-300 mb-3.5">
           <span className="flex items-center gap-1.5 font-semibold">
             <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            Серия {streak} подряд!
+            {t.streakBanner(streak)}
           </span>
           <span className="text-[11px] bg-amber-400/20 px-2 py-0.5 rounded-md font-bold">
-            Бонус серии
+            {t.streakBonusBadge}
           </span>
         </div>
       )}
 
       {/* Correct answer indicator */}
       <div className="flex items-center justify-between text-sm py-2 px-3 bg-white/5 rounded-xl mb-3 border border-white/5">
-        <span className="text-[#9A9AA8] font-medium">Правильный ответ:</span>
+        <span className="text-[#9A9AA8] font-medium">{t.correctAnswerLabel}</span>
         <span
           className={`font-display font-extrabold text-sm px-2.5 py-1 rounded-lg ${
             item.answer === 'AI'
@@ -87,7 +94,7 @@ export const ResultFeedback: React.FC<ResultFeedbackProps> = ({
               : 'bg-[#35E59A]/25 text-[#35E59A] border border-[#35E59A]/40'
           }`}
         >
-          {item.answer === 'AI' ? '🤖 AI ГЕНЕРАЦИЯ' : '📷 РЕАЛЬНОЕ ФОТО'}
+          {item.answer === 'AI' ? t.aiAnswerText : t.realAnswerText}
         </span>
       </div>
 
@@ -95,21 +102,21 @@ export const ResultFeedback: React.FC<ResultFeedbackProps> = ({
       <div className="space-y-2 mb-5">
         <div className="flex items-center gap-1.5 text-xs font-bold text-white uppercase tracking-wider">
           <HelpCircle className="w-3.5 h-3.5 text-[#7C5CFC]" />
-          <span>Почему?</span>
+          <span>{t.whyTitle}</span>
         </div>
 
         <p className="text-sm text-white/90 leading-relaxed bg-[#11111A] p-3 rounded-xl border border-white/5">
-          {item.explanation}
+          {explanation}
         </p>
 
         {/* Clues bullets */}
-        {item.clues && item.clues.length > 0 && (
+        {clues && clues.length > 0 && (
           <div className="space-y-1.5 mt-2">
             <span className="text-[11px] font-semibold text-[#9A9AA8] block">
-              Признаки для проверки:
+              {t.cluesToCheckTitle}
             </span>
             <div className="flex flex-wrap gap-1.5">
-              {item.clues.map((clue, idx) => (
+              {clues.map((clue, idx) => (
                 <span
                   key={idx}
                   className="text-xs bg-white/5 border border-white/10 text-[#9A9AA8] px-2.5 py-1 rounded-lg"
@@ -129,9 +136,10 @@ export const ResultFeedback: React.FC<ResultFeedbackProps> = ({
         onClick={onNext}
         className="w-full py-3.5 px-5 rounded-2xl bg-[#7C5CFC] hover:bg-[#6B46C1] text-white font-display font-bold text-base shadow-lg shadow-[#7C5CFC]/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
       >
-        <span>{isLastQuestion ? 'ИТОГИ ИГРЫ' : 'СЛЕДУЮЩЕЕ'}</span>
+        <span>{isLastQuestion ? t.gameOverBtn : t.nextBtn}</span>
         <ArrowRight className="w-5 h-5" />
       </motion.button>
     </motion.div>
   );
 };
+

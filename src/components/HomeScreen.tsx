@@ -1,17 +1,26 @@
 import React from 'react';
-import { Play, Trophy, Star, Sparkles, BarChart3, HelpCircle, ShieldCheck, Flame } from 'lucide-react';
+import { Play, Trophy, Sparkles, BarChart3, HelpCircle, Flame } from 'lucide-react';
 import { motion } from 'motion/react';
-import { GameStats, ScreenState } from '../types';
-import { getLevelByXp } from '../utils/levels';
+import { GameStats, ScreenState, Language } from '../types';
+import { getLevelByXp, getLevelTitle } from '../utils/levels';
+import { TRANSLATIONS } from '../utils/i18n';
+import { FEEDBACK_URL } from '../config';
 
 interface HomeScreenProps {
   stats: GameStats;
+  language: Language;
   onStartGame: () => void;
   onNavigate: (screen: ScreenState) => void;
 }
 
-export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNavigate }) => {
+export const HomeScreen: React.FC<HomeScreenProps> = ({
+  stats,
+  language,
+  onStartGame,
+  onNavigate,
+}) => {
   const currentLevel = getLevelByXp(stats.totalXp);
+  const t = TRANSLATIONS[language];
 
   return (
     <div className="flex-1 flex flex-col items-center justify-between px-4 py-6 max-w-md mx-auto w-full">
@@ -25,7 +34,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNa
         {/* Glowing badge */}
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#7C5CFC]/15 border border-[#7C5CFC]/30 text-[#7C5CFC] text-xs font-semibold mb-4 shadow-sm">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Обучающая медиа-игра</span>
+          <span>{t.gameConceptBadge}</span>
         </div>
 
         {/* Title */}
@@ -35,11 +44,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNa
 
         {/* Tagline */}
         <p className="text-lg font-medium text-[#9A9AA8] max-w-xs mx-auto">
-          «Сможешь отличить настоящее?»
+          {t.mainQuestionQuote}
         </p>
 
         <p className="text-xs text-[#9A9AA8]/80 mt-2 max-w-sm px-4">
-          Тренируй зоркость: находи артефакты нейросетей и настоящие детали реальных фото!
+          {t.gameDescription}
         </p>
       </motion.div>
 
@@ -55,18 +64,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNa
           <div className="flex items-center justify-between gap-3 text-center">
             <div className="flex-1 bg-[#1F1938] border border-[#7C5CFC]/30 rounded-2xl p-3 flex flex-col items-center">
               <span className="text-2xl mb-1">🤖</span>
-              <span className="font-display font-bold text-xs text-[#7C5CFC]">AI ГЕНЕРАЦИЯ</span>
-              <span className="text-[10px] text-[#9A9AA8] mt-0.5">Артефакты, пальцы, блики</span>
+              <span className="font-display font-bold text-xs text-[#7C5CFC]">{t.aiCardTitle}</span>
+              <span className="text-[10px] text-[#9A9AA8] mt-0.5 leading-tight">{t.aiCardClues}</span>
             </div>
 
             <div className="text-xs font-bold text-[#9A9AA8] uppercase px-1">
-              VS
+              {t.vsDivider}
             </div>
 
             <div className="flex-1 bg-[#132822] border border-[#35E59A]/30 rounded-2xl p-3 flex flex-col items-center">
               <span className="text-2xl mb-1">📷</span>
-              <span className="font-display font-bold text-xs text-[#35E59A]">РЕАЛЬНОЕ ФОТО</span>
-              <span className="text-[10px] text-[#9A9AA8] mt-0.5">Фактура, поры, физика</span>
+              <span className="font-display font-bold text-xs text-[#35E59A]">{t.realCardTitle}</span>
+              <span className="text-[10px] text-[#9A9AA8] mt-0.5 leading-tight">{t.realCardClues}</span>
             </div>
           </div>
         </div>
@@ -76,10 +85,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNa
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           onClick={onStartGame}
-          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#7C5CFC] via-[#6B46C1] to-[#4F46E5] text-white font-display font-extrabold text-xl tracking-wide shadow-lg shadow-[#7C5CFC]/30 hover:shadow-[#7C5CFC]/50 transition-all flex items-center justify-center gap-3 border border-white/20"
+          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#7C5CFC] via-[#6B46C1] to-[#4F46E5] text-white font-display font-extrabold text-xl tracking-wide shadow-lg shadow-[#7C5CFC]/30 hover:shadow-[#7C5CFC]/50 transition-all flex items-center justify-center gap-3 border border-white/20 cursor-pointer"
         >
           <Play className="w-6 h-6 fill-white" />
-          <span>ИГРАТЬ</span>
+          <span>{t.playButton}</span>
         </motion.button>
       </motion.div>
 
@@ -100,7 +109,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNa
               </div>
               <div className="min-w-0">
                 <span className="text-[11px] text-[#9A9AA8] block uppercase font-medium">
-                  Лучший результат
+                  {t.bestScoreLabel}
                 </span>
                 <span className="font-display font-bold text-base text-white truncate block">
                   {stats.bestScore} XP
@@ -115,10 +124,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNa
               </div>
               <div className="min-w-0">
                 <span className="text-[11px] text-[#9A9AA8] block uppercase font-medium">
-                  Текущий уровень
+                  {t.currentLevelLabel}
                 </span>
                 <span className="font-display font-bold text-base text-[#7C5CFC] truncate block">
-                  {currentLevel.title}
+                  {getLevelTitle(currentLevel, language)}
                 </span>
               </div>
             </div>
@@ -129,10 +138,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNa
             <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs text-[#9A9AA8]">
               <span className="flex items-center gap-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
-                Рекордная серия:
+                {t.recordStreakLabel}
               </span>
               <span className="font-bold text-amber-300">
-                {stats.maxStreak} подряд 🔥
+                {t.consecutiveCount(stats.maxStreak)} 🔥
               </span>
             </div>
           )}
@@ -142,21 +151,34 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ stats, onStartGame, onNa
         <div className="grid grid-cols-2 gap-2.5">
           <button
             onClick={() => onNavigate('STATS')}
-            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/90 transition-colors"
+            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/90 transition-colors cursor-pointer"
           >
             <BarChart3 className="w-4 h-4 text-[#7C5CFC]" />
-            <span>Статистика</span>
+            <span>{t.statsBtn}</span>
           </button>
 
           <button
             onClick={() => onNavigate('RULES')}
-            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/90 transition-colors"
+            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/90 transition-colors cursor-pointer"
           >
             <HelpCircle className="w-4 h-4 text-[#35E59A]" />
-            <span>Как играть?</span>
+            <span>{t.howToPlayBtn}</span>
           </button>
+        </div>
+
+        {/* Feedback Link */}
+        <div className="text-center pt-1 pb-1">
+          <a
+            href={FEEDBACK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-[#9A9AA8]/80 hover:text-white underline underline-offset-4 decoration-white/25 hover:decoration-white transition-colors cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <span>{t.feedbackLink}</span>
+          </a>
         </div>
       </motion.div>
     </div>
   );
 };
+

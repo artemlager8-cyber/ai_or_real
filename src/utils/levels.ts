@@ -1,9 +1,10 @@
-import { UserLevel } from '../types';
+import { UserLevel, Language } from '../types';
 
 export const LEVELS: UserLevel[] = [
   {
     level: 1,
     title: 'Новичок',
+    titleEn: 'Rookie',
     minXp: 0,
     maxXp: 500,
     badge: '🌱',
@@ -11,6 +12,7 @@ export const LEVELS: UserLevel[] = [
   {
     level: 2,
     title: 'Внимательный',
+    titleEn: 'Observant',
     minXp: 500,
     maxXp: 1200,
     badge: '🔍',
@@ -18,6 +20,7 @@ export const LEVELS: UserLevel[] = [
   {
     level: 3,
     title: 'Детектив',
+    titleEn: 'Detective',
     minXp: 1200,
     maxXp: 2500,
     badge: '🕵️',
@@ -25,6 +28,7 @@ export const LEVELS: UserLevel[] = [
   {
     level: 4,
     title: 'Эксперт',
+    titleEn: 'Expert',
     minXp: 2500,
     maxXp: 4500,
     badge: '⚡',
@@ -32,11 +36,19 @@ export const LEVELS: UserLevel[] = [
   {
     level: 5,
     title: 'AI Hunter',
+    titleEn: 'AI Hunter',
     minXp: 4500,
     maxXp: 99999,
     badge: '👑',
   },
 ];
+
+export function getLevelTitle(lvl: UserLevel, lang: Language): string {
+  if (lang === 'en' && lvl.titleEn) {
+    return lvl.titleEn;
+  }
+  return lvl.title;
+}
 
 export function getLevelByXp(xp: number): UserLevel {
   for (let i = LEVELS.length - 1; i >= 0; i--) {
